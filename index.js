@@ -86,7 +86,7 @@ function askQuestion(query) {
   }
 
 async function main() {
-    console.log("🚀 Starting Next.js configurator...");
+    console.log("🚀 Starting Best Lint...");
     isNextJsProject();
   
     const useTanStack = await askQuestion("Would you like to install TanStack Query? (yes/no): ");
