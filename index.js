@@ -14,6 +14,7 @@ const eslintConfig = {
     "eslint:recommended", 
     "plugin:prettier/recommended",
     ],
+    "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
