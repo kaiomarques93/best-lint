@@ -13,13 +13,33 @@ const eslintConfig = {
     "next/core-web-vitals", 
     "eslint:recommended", 
     "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended"
     ],
-    "plugins": ["prettier"],
+    "plugins": ["unused-imports", "import"],
   "rules": {
     "prettier/prettier": "error",
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "react-hooks/exhaustive-deps": "off",
-    "@next/next/no-img-element": "off"
+    "@next/next/no-img-element": "off",
+    "unused-imports/no-unused-imports": "warn",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index"
+        ],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ],
   }
 };
 
@@ -90,7 +110,8 @@ async function main() {
     isNextJsProject();
   
     const useTanStack = await askQuestion("Would you like to install TanStack Query? (yes/no): ");
-  
+    const useTailwind = await askQuestion("Would you like to install Eslint for Tailwind CSS? (yes/no): ");
+
     console.log('📄 Writing .eslintrc.json...');
     if (useTanStack.toLowerCase() === 'yes') {
       eslintConfig.extends.push("plugin:@tanstack/eslint-plugin-query/recommended");
@@ -99,6 +120,19 @@ async function main() {
       eslintConfig.rules["@tanstack/query/no-rest-destructuring"] = "warn";
       eslintConfig.rules["@tanstack/query/stable-query-client"] = "error";
     }
+
+    if (useTailwind.toLowerCase() === 'yes') {
+        console.log('📦 Installing Tailwind eslint packages...');
+        eslintConfig.extends.push("plugin:tailwindcss/recommended");
+        installPackages(['prettier-plugin-tailwindcss', 'eslint-plugin-tailwindcss']);
+        try {
+          execSync('npm install @tanstack/react-query', { stdio: 'inherit' });
+          console.log('✅ Installed @tanstack/react-query successfully');
+        } catch (error) {
+          console.error('❌ Error installing @tanstack/react-query:', error.message);
+        }
+      }
+    
     writeJSONFile('.eslintrc.json', eslintConfig);
   
     console.log('📄 Writing .prettierrc...');
@@ -119,7 +153,16 @@ async function main() {
     }
     writeFile('.vscode/settings.json', vscodeSettings);
   
-    installPackages(['eslint', 'prettier', 'eslint-config-prettier', 'eslint-plugin-prettier']);
+    installPackages([
+        'eslint@^8', 
+        'prettier', 
+        'eslint-config-prettier', 
+        'eslint-plugin-prettier', 
+        '@typescript-eslint/eslint-plugin@^8.16.0',
+        '@typescript-eslint/parser@^8.16.0',
+        'eslint-plugin-unused-imports@^4.1.3',
+        "eslint-plugin-import@^2.29.1"
+    ]);
   
     if (useTanStack.toLowerCase() === 'yes') {
       console.log('📦 Installing TanStack Query packages...');
