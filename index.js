@@ -3,6 +3,7 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
 const path = require('path');
+const readline = require('readline');
 
 // Get the current working directory
 const cwd = process.cwd();
@@ -31,7 +32,7 @@ const prettierConfig = `{
 
 const vscodeSettings = `{
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll.eslint": "explicit"
     },
     "editor.formatOnSave": true
   }`;
@@ -71,33 +72,66 @@ function installPackages(packages) {
   }
 }
 
-function main() {
-  console.log("🚀 Starting Best Lint...");
-  isNextJsProject();
-
-  console.log('📄 Writing .eslintrc.json...');
-  writeJSONFile('.eslintrc.json', eslintConfig);
-
-  console.log('📄 Writing .prettierrc...');
-  writeFile('.prettierrc', prettierConfig);
-
-  console.log('📄 Writing .prettierignore...');
-  fs.writeFileSync(path.join(cwd, '.prettierignore'), 'node_modules\n.next\nbuild');
-  console.log('✅ Created .prettierignore');
-
-  console.log('📄 Writing .eslintignore...');
-  fs.writeFileSync(path.join(cwd, '.eslintignore'), 'node_modules\n.next\nbuild');
-  console.log('✅ Created .eslintignore');
-
-  console.log('📄 Writing .vscode/settings.json...');
-  const vscodeSettingsPath = path.join(cwd, '.vscode');
-  if (!fs.existsSync(vscodeSettingsPath)) {
-    fs.mkdirSync(vscodeSettingsPath);
+function askQuestion(query) {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+  
+    return new Promise(resolve => rl.question(query, answer => {
+      rl.close();
+      resolve(answer);
+    }));
   }
-  writeFile('.vscode/settings.json', vscodeSettings);
 
-  installPackages(['eslint', 'prettier', 'eslint-config-prettier', 'eslint-plugin-prettier']);
-  console.log("🎉 Next.js project configured successfully!");
-}
-
+async function main() {
+    console.log("🚀 Starting Next.js configurator...");
+    isNextJsProject();
+  
+    const useTanStack = await askQuestion("Would you like to install TanStack Query? (yes/no): ");
+  
+    console.log('📄 Writing .eslintrc.json...');
+    if (useTanStack.toLowerCase() === 'yes') {
+      eslintConfig.extends.push("plugin:@tanstack/eslint-plugin-query/recommended");
+      eslintConfig.plugins.push("@tanstack/query");
+      eslintConfig.rules["@tanstack/query/exhaustive-deps"] = "error";
+      eslintConfig.rules["@tanstack/query/no-rest-destructuring"] = "warn";
+      eslintConfig.rules["@tanstack/query/stable-query-client"] = "error";
+    }
+    writeJSONFile('.eslintrc.json', eslintConfig);
+  
+    console.log('📄 Writing .prettierrc...');
+    writeFile('.prettierrc', prettierConfig);
+  
+    console.log('📄 Writing .prettierignore...');
+    fs.writeFileSync(path.join(cwd, '.prettierignore'), 'node_modules\n.next\nbuild');
+    console.log('✅ Created .prettierignore');
+  
+    console.log('📄 Writing .eslintignore...');
+    fs.writeFileSync(path.join(cwd, '.eslintignore'), 'node_modules\n.next\nbuild');
+    console.log('✅ Created .eslintignore');
+  
+    console.log('📄 Writing .vscode/settings.json...');
+    const vscodeSettingsPath = path.join(cwd, '.vscode');
+    if (!fs.existsSync(vscodeSettingsPath)) {
+      fs.mkdirSync(vscodeSettingsPath);
+    }
+    writeFile('.vscode/settings.json', vscodeSettings);
+  
+    installPackages(['eslint', 'prettier', 'eslint-config-prettier', 'eslint-plugin-prettier']);
+  
+    if (useTanStack.toLowerCase() === 'yes') {
+      console.log('📦 Installing TanStack Query packages...');
+      installPackages(['@tanstack/eslint-plugin-query', '@tanstack/react-query-devtools']);
+      try {
+        execSync('npm install @tanstack/react-query', { stdio: 'inherit' });
+        console.log('✅ Installed @tanstack/react-query successfully');
+      } catch (error) {
+        console.error('❌ Error installing @tanstack/react-query:', error.message);
+      }
+    }
+  
+    console.log("🎉 Next.js project configured successfully!");
+  }
+  
 main();
