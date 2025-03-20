@@ -9,9 +9,21 @@ const hasDep = (dep) => {
   }
 };
 
+const getTailwindVersion = () => {
+  try {
+    // Try to find the version number from package.json
+    const tailwindPkg = require('tailwindcss/package.json');
+    return tailwindPkg.version;
+  } catch (e) {
+    return '0.0.0'; // Return a default version if not found
+  }
+};
+
 const hasTanstack = hasDep('@tanstack/eslint-plugin-query');
 const hasTypeScript = hasDep('typescript');
 const hasTailwind = hasDep('tailwindcss');
+const tailwindVersion = hasTailwind ? getTailwindVersion() : '0.0.0';
+const tailwindMajorVersion = parseInt(tailwindVersion.split('.')[0], 10) || 0;
 
 const baseConfig = {
   extends: [
@@ -83,8 +95,8 @@ if (hasTanstack) {
   baseConfig.rules['@tanstack/query/stable-query-client'] = 'error';
 }
 
-// Conditionally add Tailwind rules if Tailwind is installed
-if (hasTailwind) {
+// Conditionally add Tailwind rules if Tailwind v3+ is installed
+if (hasTailwind && tailwindMajorVersion >= 3) {
   baseConfig.extends.push('plugin:tailwindcss/recommended');
   if (hasDep('tailwind-merge')) {
     baseConfig.settings = baseConfig.settings || {};
