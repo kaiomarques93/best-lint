@@ -1,121 +1,99 @@
-# Best Lint
+# best-lint
 
-The **Best Lint** is a CLI tool to quickly set up ESLint, Prettier, and optional TanStack Query configurations in newly created Next.js projects.
+A universal ESLint and Prettier configuration for React and Next.js projects.
 
 ## Features
-- **ESLint**: Sets up `.eslintrc.json` with recommended configurations for Next.js, Prettier, and additional rules.
-- **Prettier**: Sets up `.prettierrc` and `.prettierignore` for code formatting.
-- **VS Code Integration**: Creates `.vscode/settings.json` to automatically format files on save and apply ESLint fixes.
-- **TanStack Query Integration**: Optionally installs and configures TanStack Query with recommended ESLint rules.
+
+- 🚀 Zero-config setup for ESLint and Prettier
+- ⚛️ Optimized for React and Next.js
+- 🔄 Optional TanStack Query support
+- 🎨 Tailwind CSS integration
+- 🧩 TypeScript support
+- 📦 Consistent import sorting rules
+- 🛠️ Simple CLI for installation
 
 ## Installation
 
-1. Clone this repository or download the script file.
-2. Ensure you have Node.js installed.
-3. Make the script executable (optional):
-   ```bash
-   chmod +x best-lint.js
-   ```
+```bash
+# Using npm
+npm install --save-dev best-lint
 
-## Usage
+# Using yarn
+yarn add --dev best-lint
 
-Run the script in the root of your Next.js project:
+# Using pnpm
+pnpm add --save-dev best-lint
+```
+
+## Quick Setup
+
+After installing the package, you can run the CLI to set up everything automatically:
 
 ```bash
 npx best-lint
 ```
 
-The script will:
-1. Verify that you are inside a Next.js project.
-2. Prompt you to decide whether to install **TanStack Query**.
-3. Configure and create the following files:
-   - `.eslintrc.json`
-   - `.prettierrc`
-   - `.prettierignore`
-   - `.eslintignore`
-   - `.vscode/settings.json`
-4. Install required dependencies via npm.
+This will:
+1. Create `.eslintrc.json` with best-lint configuration
+2. Create `.prettierrc.js` with best-lint configuration
+3. Detect TanStack Query and install related plugins if needed
+4. Detect Tailwind CSS and install related plugins if needed
+5. Add a lint script to your package.json if it doesn't exist
 
-## File Details
+## Manual Setup
 
-### .eslintrc.json
+### ESLint Configuration
+
+Create `.eslintrc.json` in your project root:
+
 ```json
 {
-  "extends": [
-    "next",
-    "next/core-web-vitals",
-    "eslint:recommended",
-    "prettier"
-  ],
-  "plugins": ["prettier"],
-  "rules": {
-    "prettier/prettier": "error",
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
-  }
-}
-```
-If **TanStack Query** is enabled, the following will be added to the configuration:
-- **Extends**: `plugin:@tanstack/eslint-plugin-query/recommended`
-- **Plugins**: `@tanstack/query`
-- **Rules**: 
-  ```json
-  "@tanstack/query/exhaustive-deps": "error",
-  "@tanstack/query/no-rest-destructuring": "warn",
-  "@tanstack/query/stable-query-client": "error"
-  ```
-
-### .prettierrc
-```json
-{
-  "singleQuote": true,
-  "trailingComma": "all",
-  "printWidth": 80,
-  "tabWidth": 2,
-  "semi": false
+  "extends": ["best-lint"]
 }
 ```
 
-### .prettierignore
-```
-node_modules
-.next
-build
-```
+### Prettier Configuration
 
-### .eslintignore
-```
-node_modules
-.next
-build
+Create `.prettierrc.js` in your project root:
+
+```js
+module.exports = require('best-lint/prettier');
 ```
 
-### .vscode/settings.json
-```json
-{
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
-  "editor.formatOnSave": true
-}
-```
+## Features
 
-## Dependencies
+### Core Rules
 
-The following packages are installed automatically:
-- **ESLint**: `eslint`, `eslint-config-prettier`, `eslint-plugin-prettier`
-- **Prettier**: `prettier`
-- **TanStack Query** (if enabled): 
-  - Dev dependencies: `@tanstack/eslint-plugin-query`, `@tanstack/react-query-devtools`
-  - Production dependency: `@tanstack/react-query`
+- Extends Next.js core web vitals
+- Prettier integration
+- Import sorting and validation
+- Unused imports detection
 
-## Customization
-You can customize the rules in `.eslintrc.json`, `.prettierrc`, or any other files as needed.
+### TypeScript Support
 
-## Troubleshooting
-If you encounter any issues during the package installation, check your internet connection or try running the command again. If errors persist, consider removing the `node_modules` and `package-lock.json` files and running `npm install`.
+TypeScript support is automatically enabled if TypeScript is detected in your project.
 
-## Contributing
-Feel free to open issues and submit pull requests to improve this configurator. Contributions are welcome!
+### TanStack Query Support
+
+TanStack Query rules are automatically enabled if @tanstack/react-query is detected in your project.
+
+### Tailwind CSS Support
+
+Tailwind CSS rules are automatically enabled if tailwindcss is detected in your project.
+
+## All included plugins and configurations
+
+- eslint-config-next
+- eslint-config-prettier
+- eslint-plugin-prettier
+- eslint-plugin-import
+- eslint-plugin-unused-imports
+- eslint-plugin-simple-import-sort
+- eslint-plugin-tailwindcss (optional)
+- @typescript-eslint/eslint-plugin (optional)
+- @tanstack/eslint-plugin-query (optional)
+- prettier-plugin-tailwindcss (optional)
 
 ## License
-This project is open-source and available under the [MIT License](LICENSE).
+
+MIT 
