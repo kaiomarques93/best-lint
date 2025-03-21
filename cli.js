@@ -214,6 +214,13 @@ const ConfigGenerator = {
     
     return prettierConfig;
   },
+
+  createPrettierIgnore: (currentDir) => {
+    const prettierIgnorePath = path.join(currentDir, '.prettierignore');
+    if (!FileSystem.exists(prettierIgnorePath)) {
+      FileSystem.writeJson(prettierIgnorePath, ['node_modules', 'dist', 'build']);
+    }
+  },
   
   // Update package.json scripts
   updatePackageJsonScripts: (packageJson) => {
@@ -256,6 +263,7 @@ function init() {
   
   // Generate Prettier config
   const prettierConfig = ConfigGenerator.createPrettierConfig(features, currentDir);
+  ConfigGenerator.createPrettierIgnore(currentDir);
   const prettierConfigPath = path.join(currentDir, '.prettierrc.json');
   FileSystem.writeJson(prettierConfigPath, prettierConfig);
   log('✅ Created .prettierrc.json configuration', colors.green);
